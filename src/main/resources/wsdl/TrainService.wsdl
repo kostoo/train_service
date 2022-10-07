@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
                   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -8,7 +8,7 @@
 
     <wsdl:types>
         <xs:schema>
-            <xs:import namespace="" schemaLocation="Train.xsd"/>
+            <xs:import schemaLocation="Train.xsd"/>
         </xs:schema>
     </wsdl:types>
 
