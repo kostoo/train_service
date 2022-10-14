@@ -5,7 +5,7 @@
 
     <xs:complexType name="Wagon">
         <xs:sequence>
-            <xs:element name="id" type="xs:string"/>
+            <xs:element name="id" type="xs:string" minOccurs="0"/>
             <xs:element name="num" type="xs:int"/>
             <xs:element name="seats" type="xs:int"/>
             <xs:element name="type" type="xs:string"/>
@@ -14,34 +14,12 @@
 
     <xs:complexType name="Train">
         <xs:sequence>
-            <xs:element name="id" type="xs:string"/>
+            <xs:element name="id" type="xs:string" minOccurs="0"/>
             <xs:element name="name" type="xs:string"/>
             <xs:element name="locomotive-type"/>
             <xs:element name="form-date" type="xs:dateTime"/>
-            <xs:element name="wagons">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element type="Wagon" name="wagon"  maxOccurs="unbounded"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
+            <xs:element name="wagons" type="Wagon" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-
-    <xs:element name="addTrain">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="train" minOccurs="1" maxOccurs="1"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-
-    <xs:element name="AddTrainResponse">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="train" minOccurs="0" maxOccurs="1"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
 
 </xs:schema>

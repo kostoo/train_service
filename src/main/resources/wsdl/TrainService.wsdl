@@ -1,48 +1,84 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-                  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+<definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:tns="http://train.rzd.ru/"
+                  xmlns="http://schemas.xmlsoap.org/wsdl/"
+                  targetNamespace="http://train.rzd.ru/"
                   name="TrainService">
-    <wsdl:documentation>Веб сервис TrainService, для добавления новых поездов и вагонов в базу данных.
-    </wsdl:documentation>
+    <documentation>Веб сервис TrainService, для добавления новых поездов и вагонов в базу данных.
+    </documentation>
 
-    <wsdl:types>
-        <xs:schema>
-            <xs:import schemaLocation="Train.xsd"/>
-        </xs:schema>
-    </wsdl:types>
+    <types>
+        <xsd:schema targetNamespace="http://train.rzd.ru/">
+            <xsd:element name="train" type="tns:Train"/>
 
-    <wsdl:message name="AddTrainRequest">
-        <wsdl:part name="parameters" element="addTrain"/>
-    </wsdl:message>
-    <wsdl:message name="AddTrainResponse">
-        <wsdl:part name="parameters" element="AddTrainResponse"/>
-    </wsdl:message>
+            <xsd:complexType name="Wagon">
+                <xsd:sequence>
+                    <xsd:element name="id" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="num" type="xsd:int"/>
+                    <xsd:element name="seats" type="xsd:int"/>
+                    <xsd:element name="type" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
 
-    <wsdl:portType name="TrainService">
-        <wsdl:operation name="createNewTrain">
-            <wsdl:input message="AddTrainRequest"/>
-            <wsdl:output message="AddTrainResponse"/>
-        </wsdl:operation>
-    </wsdl:portType>
+            <xsd:complexType name="Train">
+                <xsd:sequence>
+                    <xsd:element name="id" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="name" type="xsd:string"/>
+                    <xsd:element name="locomotive-type" type="xsd:string"/>
+                    <xsd:element name="form-date" type="xsd:dateTime"/>
+                    <xsd:element name="wagons" type="tns:Wagon" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
 
-    <wsdl:binding name="TrainServiceSOAP" type="TrainService">
+            <xsd:element name="addTrain">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element ref="tns:train" minOccurs="1" maxOccurs="1"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="addTrainResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element ref="tns:train" minOccurs="0" maxOccurs="1"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </types>
+
+    <message name="AddTrainRequest">
+        <part element="tns:train" name="parameters" />
+    </message>
+    <message name="AddTrainResponse">
+        <part name="return" element="tns:train" />
+    </message>
+
+    <portType name="TrainInterface">
+        <operation name="createNewTrain">
+            <input message="tns:AddTrainRequest"/>
+            <output message="tns:AddTrainResponse"/>
+        </operation>
+    </portType>
+
+    <binding name="TrainServiceSOAP" type="tns:TrainInterface">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-        <wsdl:operation name="createNewTrain">
-            <soap:operation
-                    soapAction="localhost:8080/TrainService/createNewTrain"/>
-            <wsdl:input>
+        <operation name="createNewTrain">
+            <soap:operation soapAction="http://train.rzd.ru/TrainService/createNewTrain"/>
+            <input>
                 <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
+            </input>
+            <output>
                 <soap:body use="literal"/>
-            </wsdl:output>
-        </wsdl:operation>
-    </wsdl:binding>
+            </output>
+        </operation>
+    </binding>
 
-    <wsdl:service name="TrainService">
-        <wsdl:port binding="TrainServiceSOAP" name="TrainServiceSOAP">
-            <soap:address location="localhost:8080/TrainService"/>
-        </wsdl:port>
-    </wsdl:service>
-</wsdl:definitions>
+    <service name="TrainService">
+        <port binding="tns:TrainServiceSOAP" name="TrainServiceSOAP">
+            <soap:address location="localhost:8081/TrainService"/>
+        </port>
+    </service>
+</definitions>
