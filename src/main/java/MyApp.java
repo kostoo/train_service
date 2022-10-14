@@ -8,10 +8,12 @@ public class MyApp {
 
         try {
             System.out.println("Start camel context");
+
             main.start();
+
         } finally {
-            System.out.println("Stop camel context");
-            main.stop();
+          //  System.out.println("Stop camel context");
+           // main.stop();
         }
     }
 

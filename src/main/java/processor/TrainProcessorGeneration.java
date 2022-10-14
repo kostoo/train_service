@@ -14,7 +14,7 @@ public class TrainProcessorGeneration implements Processor {
        Train body = exchange.getIn().getBody(Train.class);
 
        body.setId(generateUUID());
-       body.setWagons(generateWagonsId(body.getWagons()));
+       generateWagonsId(body.getWagons());
 
        exchange.getOut().setBody(body);
     }
@@ -23,12 +23,11 @@ public class TrainProcessorGeneration implements Processor {
        return UUID.randomUUID().toString();
     }
 
-    public List<Wagon> generateWagonsId(List<Wagon> wagons) {
+    public void generateWagonsId(List<Wagon> wagons) {
         for (Wagon wagon:wagons) {
             if (wagon.getId() != null) {
                 wagon.setId(generateUUID());
             }
         }
-        return wagons;
     }
 }

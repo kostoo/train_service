@@ -1,0 +1,18 @@
+POST http://localhost:8081/TrainService
+Content-Type: application/xml
+SoapAction: ""
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:data="http://train.rzd.ru/">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <data:train>
+            <id>1</id>
+            <name>qwe</name>
+            <locomotive-type>asd</locomotive-type>
+            <form-date>2011-01-01T00:00:00Z</form-date>
+<!--            <data:num>2</data:num>-->
+<!--            <data:seats>3</data:seats>-->
+<!--            <data:type>qwe</data:type>-->
+        </data:train>
+    </soapenv:Body>
+</soapenv:Envelope>
