@@ -1,3 +1,4 @@
+
 import org.apache.camel.spring.Main;
 
 public class MyApp {

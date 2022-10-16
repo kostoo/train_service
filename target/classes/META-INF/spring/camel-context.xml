@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://camel.apache.org/schema/cxf"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+       ">
+
+    <camelContext xmlns="http://camel.apache.org/schema/spring">
+        <route id="wsRoute">
+            <from uri="cxf:bean:TrainServiceEndpoint" />
+            <process ref="generatorIdObjectTrainWagons"/>
+            <to uri="activemq:test.MyQueue"/>
+        </route>
+
+        <route id="jmsRoute">
+            <from uri="activemq:test.MyQueue"/>
+            <to uri="log:out"/>
+        </route>
+    </camelContext>
+
+    <bean id="generatorIdObjectTrainWagons" class="processor.TrainProcessorGeneration"/>
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+
+    <bean id="trainIdGenerator" class="processor.TrainProcessorGeneration"/>
+
+
+    <bean id="jmsConnectionFactory"
+          class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="tcp://0.0.0.0:61616" />
+        <property name="userName" value="admin"/>
+        <property name="password" value="admin"/>
+    </bean>
+
+    <bean id="pooledConnectionFactory"
+          class="org.apache.activemq.pool.PooledConnectionFactory">
+        <property name="maxConnections" value="8" />
+        <property name="maximumActiveSessionPerConnection" value="500" />
+        <property name="connectionFactory" ref="jmsConnectionFactory" />
+    </bean>
+
+    <bean id="jmsConfig" class="org.apache.camel.component.jms.JmsConfiguration">
+        <property name="connectionFactory" ref="pooledConnectionFactory"/>
+        <property name="transacted" value="false"/>
+        <property name="concurrentConsumers" value="10"/>
+
+    </bean>
+
+    <bean id="activemq"
+          class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property name="configuration" ref="jmsConfig"/>
+    </bean>
+
+    <cxf:cxfEndpoint id="TrainServiceEndpoint"
+                     address="http://localhost:8081/TrainService"
+                     serviceClass="ru.rzd.train.TrainInterface"
+                     wsdlURL="wsdl/TrainService.wsdl">
+        <cxf:properties>
+            <entry key="dataFormat" value="POJO"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+
+</beans>

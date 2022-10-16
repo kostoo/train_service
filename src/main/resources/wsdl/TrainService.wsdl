@@ -11,6 +11,7 @@
     <types>
         <xsd:schema targetNamespace="http://train.rzd.ru/">
             <xsd:element name="train" type="tns:Train"/>
+            <xsd:element name="wagon" type="tns:Wagon"/>
 
             <xsd:complexType name="Wagon">
                 <xsd:sequence>

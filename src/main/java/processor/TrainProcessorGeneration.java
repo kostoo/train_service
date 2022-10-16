@@ -23,11 +23,12 @@ public class TrainProcessorGeneration implements Processor {
        return UUID.randomUUID().toString();
     }
 
-    public void generateWagonsId(List<Wagon> wagons) {
+    public List<Wagon> generateWagonsId(List<Wagon> wagons) {
         for (Wagon wagon:wagons) {
             if (wagon.getId() != null) {
                 wagon.setId(generateUUID());
             }
         }
+        return wagons;
     }
 }
