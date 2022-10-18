@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://camel.apache.org/schema/cxf"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+       ">
+
+    <camelContext xmlns="http://camel.apache.org/schema/spring">
+        <route id="wsRoute">
+            <from uri="cxf:bean:TrainServiceEndpoint" />
+            <process ref="trainIdGenerator"/>
+            <to uri="jms:test.MyQueue"/>
+        </route>
+
+        <route id="jmsRoute">
+            <from uri="jms:test.MyQueue"/>
+            <process ref="addInDb"/>
+            <to uri="log:out"/>
+        </route>
+    </camelContext>
+
+    <bean id="db" class="org.apache.camel.spring.spi.BridgePropertyPlaceholderConfigurer"/>
+
+    <bean id="addInDb" class="processor.TrainDbGeneration"/>
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+
+    <bean id="trainIdGenerator" class="processor.TrainProcessorGeneration"/>
+
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="tcp://0.0.0.0:61616" />
+        <property name="user" value="admin"/>
+        <property name="password" value="admin"/>
+    </bean>
+
+    <bean id="jmsConfig" class="org.apache.camel.component.jms.JmsConfiguration">
+        <property name="connectionFactory" ref="jmsConnectionFactory"/>
+        <property name="transacted" value="false"/>
+        <property name="concurrentConsumers" value="10"/>
+        <property name="deliveryPersistent" value="true"/>
+    </bean>
+
+    <bean id="jms" class="org.apache.camel.component.jms.JmsComponent">
+        <property name="configuration" ref="jmsConfig"/>
+    </bean>
+
+    <cxf:cxfEndpoint id="TrainServiceEndpoint"
+                     address="http://localhost:8081/TrainService"
+                     serviceClass="ru.rzd.train.TrainInterface"
+                     wsdlURL="wsdl/TrainService.wsdl">
+        <cxf:properties>
+            <entry key="dataFormat" value="POJO"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+
+</beans>

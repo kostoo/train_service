@@ -9,9 +9,18 @@
     </documentation>
 
     <types>
-        <xsd:schema targetNamespace="http://train.rzd.ru/">
+        <xsd:schema targetNamespace="http://train.rzd.ru/" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+                    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+                    elementFormDefault="qualified" attributeFormDefault="unqualified"
+                    jaxb:extensionBindingPrefixes="xjc" jaxb:version="2.1">
+            <xsd:annotation>
+                <xsd:appinfo>
+                    <jaxb:globalBindings>
+                        <xjc:serializable/>
+                    </jaxb:globalBindings>
+                </xsd:appinfo>
+            </xsd:annotation>
             <xsd:element name="train" type="tns:Train"/>
-            <xsd:element name="wagon" type="tns:Wagon"/>
 
             <xsd:complexType name="Wagon">
                 <xsd:sequence>
@@ -28,7 +37,13 @@
                     <xsd:element name="name" type="xsd:string"/>
                     <xsd:element name="locomotive-type" type="xsd:string"/>
                     <xsd:element name="form-date" type="xsd:dateTime"/>
-                    <xsd:element name="wagons" type="tns:Wagon" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="wagons" type="tns:Wagons" />
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="Wagons">
+                <xsd:sequence>
+                    <xsd:element name="wagon" type="tns:Wagon" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:complexType>
 

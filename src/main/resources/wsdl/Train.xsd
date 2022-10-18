@@ -1,25 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+            targetNamespace="http://train.rzd.ru/">
 
-    <xs:element name="train" type="Train"/>
+    <xsd:element name="train" type="Train"/>
+    <xsd:element name="wagon" type="Wagon"/>
 
-    <xs:complexType name="Wagon">
-        <xs:sequence>
-            <xs:element name="id" type="xs:string" minOccurs="0"/>
-            <xs:element name="num" type="xs:int"/>
-            <xs:element name="seats" type="xs:int"/>
-            <xs:element name="type" type="xs:string"/>
-        </xs:sequence>
-    </xs:complexType>
+    <xsd:complexType name="Wagon">
+        <xsd:sequence>
+            <xsd:element name="id" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="num" type="xsd:int"/>
+            <xsd:element name="seats" type="xsd:int"/>
+            <xsd:element name="type" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
 
-    <xs:complexType name="Train">
-        <xs:sequence>
-            <xs:element name="id" type="xs:string" minOccurs="0"/>
-            <xs:element name="name" type="xs:string"/>
-            <xs:element name="locomotive-type"/>
-            <xs:element name="form-date" type="xs:dateTime"/>
-            <xs:element name="wagons" type="Wagon" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
+    <xsd:complexType name="Train">
+        <xsd:sequence>
+            <xsd:element name="id" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="name" type="xsd:string"/>
+            <xsd:element name="locomotive-type" type="xsd:string"/>
+            <xsd:element name="form-date" type="xsd:dateTime"/>
+            <xsd:element name="wagons" type="Wagons"/>
+        </xsd:sequence>
+    </xsd:complexType>
 
-</xs:schema>
+    <xsd:element name="addTrain">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="train" minOccurs="1" maxOccurs="1"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="addTrainResponse">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="train" minOccurs="0" maxOccurs="1"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="Wagons">
+        <xsd:sequence>
+            <xsd:element name="wagon" type="Wagon" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

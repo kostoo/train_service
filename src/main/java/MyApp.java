@@ -1,6 +1,8 @@
 
 import org.apache.camel.spring.Main;
 
+import javax.sql.DataSource;
+
 public class MyApp {
 
     public static void main(String[] args) throws Exception {
