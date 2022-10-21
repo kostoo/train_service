@@ -1,7 +1,6 @@
 
 import org.apache.camel.spring.Main;
 
-import javax.sql.DataSource;
 
 public class MyApp {
 
@@ -9,15 +8,9 @@ public class MyApp {
         Main main = new Main();
         main.setApplicationContextUri("META-INF/spring/camel-context.xml");
 
-        try {
-            System.out.println("Start camel context");
+        System.out.println("Start camel context");
 
-            main.start();
-
-        } finally {
-          //  System.out.println("Stop camel context");
-           // main.stop();
-        }
+        main.start();
     }
 
 }
