@@ -6,7 +6,7 @@ SoapAction: ""
     <soapenv:Header/>
     <soapenv:Body>
         <data:train>
-            <name>qwe</name>
+            <name>spb-msc</name>
             <locomotive-type>asd</locomotive-type>
             <form-date>2011-01-01T00:00:00Z</form-date>
             <wagons>

@@ -10,50 +10,77 @@
 
     <camelContext xmlns="http://camel.apache.org/schema/spring">
         <route id="wsRoute">
-            <from uri="cxf:bean:TrainServiceEndpoint" />
+            <from uri="cxf:bean:TrainServiceEndpoint"/>
             <process ref="trainIdGenerator"/>
-            <to uri="jms:test.MyQueue"/>
+            <inOnly uri="activemq:test.Queue"/>
         </route>
 
         <route id="jmsRoute">
-            <from uri="jms:test.MyQueue"/>
-            <process ref="addInDb"/>
-            <to uri="log:out"/>
-        </route>
-    </camelContext>
+            <from uri="activemq:test.Queue"/>
+            <transform>
+                <method ref="trainMapper" method="getMapTrain"/>
+            </transform>
+            <to uri="sql:INSERT INTO train(id, name, locomotive_type, date_time)
+                                     values(:#TrainId, :#TrainName, :#TrainLocomotiveType, :#TrainDateTime)"
+            />
 
-    <bean id="db" class="org.apache.camel.spring.spi.BridgePropertyPlaceholderConfigurer"/>
+            <split>
+                <simple>${body[TrainWagons]}</simple>
+                <transform>
+                    <method ref="wagonMapper" method="getMapWagon"/>
+                </transform>
+                <to uri="sql:INSERT INTO wagon(id, num, seats, type, id_train)
+                                         values(:#WagonId, :#WagonNum, :#WagonSeats, :#WagonType, :#UUIDTrain)"/>
+            </split>
+    </route>
 
-    <bean id="addInDb" class="processor.TrainDbGeneration"/>
+</camelContext>
+<bean id="train" class="ru.rzd.train.Train"/>
 
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+<bean id="wagonMapper" class="util.WagonMapper"/>
 
-    <bean id="trainIdGenerator" class="processor.TrainProcessorGeneration"/>
+<bean id="trainMapper" class="util.TrainMapper"/>
 
-    <bean id="jmsConnectionFactory" class="org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="tcp://0.0.0.0:61616" />
-        <property name="user" value="admin"/>
-        <property name="password" value="admin"/>
-    </bean>
+<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
-    <bean id="jmsConfig" class="org.apache.camel.component.jms.JmsConfiguration">
-        <property name="connectionFactory" ref="jmsConnectionFactory"/>
-        <property name="transacted" value="false"/>
-        <property name="concurrentConsumers" value="10"/>
-        <property name="deliveryPersistent" value="true"/>
-    </bean>
+<bean id="trainIdGenerator" class="processor.TrainProcessorGeneration"/>
 
-    <bean id="jms" class="org.apache.camel.component.jms.JmsComponent">
-        <property name="configuration" ref="jmsConfig"/>
-    </bean>
+<bean id="jmsConnectionFactory" class="org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="tcp://0.0.0.0:61616"/>
+    <property name="user" value="admin"/>
+    <property name="password" value="admin"/>
+</bean>
 
-    <cxf:cxfEndpoint id="TrainServiceEndpoint"
-                     address="http://localhost:8081/TrainService"
-                     serviceClass="ru.rzd.train.TrainInterface"
-                     wsdlURL="wsdl/TrainService.wsdl">
-        <cxf:properties>
-            <entry key="dataFormat" value="POJO"/>
-        </cxf:properties>
-    </cxf:cxfEndpoint>
+<bean id="jmsConfig" class="org.apache.camel.component.jms.JmsConfiguration">
+    <property name="connectionFactory" ref="jmsConnectionFactory"/>
+    <property name="transacted" value="false"/>
+    <property name="concurrentConsumers" value="5"/>
+    <property name="maxConcurrentConsumers" value="10"/>
+</bean>
 
-</beans>
+<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    <property name="driverClassName" value="org.postgresql.Driver"/>
+    <property name="url" value="jdbc:postgresql://localhost:5432/trainServiceDb?serverTimezone=Europe/Moscow"/>
+    <property name="username" value="nikita"/>
+    <property name="password" value="nikita"/>
+</bean>
+
+        <!-- configure the Camel SQL component to use the JDBC data source -->
+<bean id="sql" class="org.apache.camel.component.sql.SqlComponent">
+    <property name="dataSource" ref="dataSource"/>
+</bean>
+
+<bean id="activemq" class="org.apache.camel.component.jms.JmsComponent">
+    <property name="configuration" ref="jmsConfig"/>
+</bean>
+
+<cxf:cxfEndpoint id="TrainServiceEndpoint"
+                 address="http://localhost:8081/TrainService"
+                 serviceClass="ru.rzd.train.TrainInterface"
+                 wsdlURL="wsdl/TrainService.wsdl">
+<cxf:properties>
+    <entry key="dataFormat" value="POJO"/>
+</cxf:properties>
+</cxf:cxfEndpoint>
+
+        </beans>
